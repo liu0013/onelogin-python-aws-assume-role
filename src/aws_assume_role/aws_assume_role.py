@@ -7,7 +7,7 @@ import os
 import sys
 import time
 import argparse
-
+import gauth
 import boto3
 import botocore
 from botocore.exceptions import ClientError
@@ -268,10 +268,12 @@ def get_saml_response(client, username_or_email, password, app_id, onelogin_subd
                 if not verified_with_push:
                     # Otherwise, let's request OTP token to be inserted manually
                     print("Enter the OTP Token for %s: " % device_type)
-                    otp_token = sys.stdin.readline().strip()
+                    # otp_token = sys.stdin.readline().strip()
+                    otp_token = gauth.get_token()
             elif 'otp_token' not in mfa_verify_info:
                 print("Enter the OTP Token for %s: " % mfa_verify_info['device_type'])
-                otp_token = sys.stdin.readline().strip()
+                # otp_token = sys.stdin.readline().strip()
+                otp_token = gauth.get_token()
             else:
                 otp_token = mfa_verify_info['otp_token']
 
@@ -304,7 +306,8 @@ def get_saml_response(client, username_or_email, password, app_id, onelogin_subd
                             else:
                                 print("The OTP Token was not able to be processed, please introduce a new one: ")
 
-                        otp_token = sys.stdin.readline().strip()
+                        # otp_token = sys.stdin.readline().strip()
+                        otp_token = gauth.get_token() 
                         saml_endpoint_response = client.get_saml_assertion_verifying(app_id, device_id, state_token, otp_token, do_not_notify=True)
 
                     mfa_error = mfa_error + 1
@@ -407,7 +410,8 @@ def main():
             print("OneLogin Username: ")
             username_or_email = sys.stdin.readline().strip()
 
-            password = getpass.getpass("\nOneLogin Password: ")
+            # password = getpass.getpass("\nOneLogin Password: ")
+            password = gauth.get_passwd()
             ask_for_user_again = False
             ask_for_role_again = True
         elif i == 0:
@@ -421,7 +425,8 @@ def main():
                 if options.password:
                     password = options.password
                 else:
-                    password = getpass.getpass("\nOneLogin Password: ")
+                    # password = getpass.getpass("\nOneLogin Password: ")
+                    password = gauth.get_passwd()
 
                 if options.app_id:
                     app_id = options.app_id
